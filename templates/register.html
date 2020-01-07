@@ -1,0 +1,32 @@
+
+{% extends "base.html" %}
+
+{% block contenido %}
+
+<form class="register-form">
+    <div class="form-group">
+        <label for="email_id">Introduce tu email</label>
+        <input type="email" class="form-control" id="email_id" aria-describedby="emailHelp" placeholder="Introducir email">
+        <small id="emailHelp" class="form-text text-muted">No compartiremos tu email con nadie.</small>
+    </div>
+    <div class="form-group">
+        <label for="password_id">Elige una contraseña</label>
+        <input type="password" class="form-control" id="password_id" placeholder="Contraseña">
+    </div>
+    <div class="form-group">
+        <label for="password_confirm_id">Confirma tu contraseña</label>
+        <input type="password" class="form-control" id="password_confirm_id" placeholder="Contraseña">
+    </div>
+    <div class="form-check">
+        <input type="checkbox" class="form-check-input" id="exampleCheck1">
+        <label class="form-check-label" for="exampleCheck1">Check me out</label>
+    </div>
+    <div class="boton">
+        <button type="submit" class="btn btn-primary">Empezar a votar!</button>
+    </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" src="{{ url_for('static',filename='js/registro.js') }}"></script>
+{% endblock %}
