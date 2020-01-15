@@ -10,12 +10,14 @@ def conexion():
 
 
 
-def select(conexion, query):
-
+def fetch_all(conexion, query, *args):
     with conexion.cursor() as cursor:
-        # Read a single record
-        sql = "SELECT * FROM `categorias`"
-        cursor.execute(sql)
-        categorias = cursor.fetchall()
-    return categorias
+        cursor.execute(query, args)
+        return cursor.fetchall()
+
+def modify(conexion, query, *args):
+    with conexion.cursor() as cursor:
+        cursor.execute(query, args)
+    conexion.commit()
+
 

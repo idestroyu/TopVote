@@ -3,22 +3,21 @@
 
 {% block contenido %}
 
-<form>
+<form class="login-form">
   <div class="form-group">
-    <label for="email_id">Email</label>
-    <input type="email" class="form-control" id="email_id" aria-describedby="emailHelp" placeholder="Introducir email">
-    <small id="emailHelp" class="form-text text-muted">No compartiremos tu email con nadie.</small>
+    <label for="username_id">Usuario</label>
+    <input type="username" name="username" class="form-control" id="username_id" placeholder="Nombre de usuario">
   </div>
   <div class="form-group">
     <label for="password_id">Contraseña</label>
-    <input type="password" class="form-control" id="password_id" placeholder="Contraseña">
+    <input type="password" name="password" class="form-control" id="password_id" placeholder="Contraseña">
   </div>
-  <div class="form-check">
-    <input type="checkbox" class="form-check-input" id="exampleCheck1">
-    <label class="form-check-label" for="exampleCheck1">Check me out</label>
+  <div class="boton">
+      <button type="submit" class="btn btn-primary">Entrar!</button>
   </div>
-    <div class="boton">
-        <button type="submit" class="btn btn-primary">Entrar!</button>
-    </div>
 </form>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" src="{{ url_for('static',filename='js/registro.js') }}"></script>
 {% endblock %}

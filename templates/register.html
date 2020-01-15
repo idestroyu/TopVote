@@ -6,12 +6,16 @@
 <form class="register-form">
     <div class="form-group">
         <label for="email_id">Introduce tu email</label>
-        <input type="email" class="form-control" id="email_id" aria-describedby="emailHelp" placeholder="Introducir email">
+        <input type="email" name="email"  class="form-control" id="email_id" aria-describedby="emailHelp" placeholder="Email">
         <small id="emailHelp" class="form-text text-muted">No compartiremos tu email con nadie.</small>
     </div>
     <div class="form-group">
+        <label for="username_id">Crea un nombre de usuario</label>
+        <input type="username" name="username"  class="form-control" id="username_id" placeholder="Nombre de usuario">
+    </div>
+    <div class="form-group">
         <label for="password_id">Elige una contraseña</label>
-        <input type="password" class="form-control" id="password_id" placeholder="Contraseña">
+        <input type="password" name="password" class="form-control" id="password_id" placeholder="Contraseña">
     </div>
     <div class="form-group">
         <label for="password_confirm_id">Confirma tu contraseña</label>

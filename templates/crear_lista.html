@@ -1,0 +1,35 @@
+
+{% extends "base.html" %}
+
+{% block contenido %}
+
+<form class="create-list-form">
+  <div class="form-group">
+    <label for="title">Titulo</label>
+    <input type="title" name="title" class="form-control" id="title" placeholder="Titulo para la lista">
+  </div>
+  <div class="form-group">
+    <label for="description_id">Descripcion</label>
+    <input type="textarea" rows="5" name="description" class="form-control" id="description_id" placeholder="Describe la lista">
+  </div>
+  <div class="form-group">
+    <label for="image_id">Imagen de portada</label>
+    <input class="form-control" name="image" id="image_id" placeholder="URL de imagen">
+  </div>
+  <div class="form-group">
+    <label for="category_id">Elegir categoria</label>
+    <select name="category" class="form-control" id="category_id">
+        {% for categoria in categorias %}
+          <option id="{{ categoria['Id'] }}">{{ categoria['nombre'] }}</option>
+  		{% endfor %}
+    </select>
+  </div>
+  <div class="boton">
+      <button type="submit" class="btn btn-primary">Create</button>
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" src="{{ url_for('static',filename='js/registro.js') }}"></script>
+{% endblock %}
