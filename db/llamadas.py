@@ -1,23 +1,22 @@
-import pymysql
+import sqlite3
+import os
+
 
 def conexion():
-    return pymysql.connect(host='localhost',
-                           user='root',
-                           password='Folcov1963Roccos12',
-                           db='top_vote',
-                           charset='utf8mb4',
-                           cursorclass=pymysql.cursors.DictCursor)
+    localizacion = os.path.dirname(os.path.realpath(__file__))
 
+    conn = sqlite3.connect(localizacion + '/topvote.db')
 
+    # Para que nos devuelva lista de diccionarios
+    conn.row_factory = sqlite3.Row
 
+    return conn
 def fetch_all(conexion, query, *args):
-    with conexion.cursor() as cursor:
-        cursor.execute(query, args)
-        return cursor.fetchall()
+    cursor = conexion.cursor()
+    cursor.execute(query, args)
+    return cursor.fetchall()
 
 def modify(conexion, query, *args):
-    with conexion.cursor() as cursor:
-        cursor.execute(query, args)
+    cursor = conexion.cursor()
+    cursor.execute(query, args)
     conexion.commit()
-
-

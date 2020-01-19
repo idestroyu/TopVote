@@ -1,18 +1,11 @@
-from passlib.hash import pbkdf2_sha256
+import bcrypt
 
 def hash_password(password):
-    salt = os.urandom(16)
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
+    hashed.find(salt)
 
-    m = hashlib.md5()
-    m.update(salt + password)
-    return m.hexdigest(), salt
+    return hashed
 
-def verify_password(password, salt):
-    key = hashlib.pbkdf2_hmac(
-        'sha256',
-        password.encode('utf-8'),  # Convert the password to bytes
-        salt,
-        10000
-    )
-
-    return str(key)
+def verify_password(password, hashed):
+    return bcrypt.checkpw(password.encode('utf-8'), hashed)

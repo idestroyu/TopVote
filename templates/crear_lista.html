@@ -3,6 +3,9 @@
 
 {% block contenido %}
 
+<div class="text-center mt-5">
+  <h3>Crea una nueva lista</h3>
+</div>
 <form class="create-list-form">
   <div class="form-group">
     <label for="title">Titulo</label>
@@ -25,11 +28,11 @@
     </select>
   </div>
   <div class="boton">
-      <button type="submit" class="btn btn-primary">Create</button>
+      <button type="submit" class="btn btn-primary">Crear</button>
   </div>
 </form>
 {% endblock %}
 
 {% block scripts %}
-<script type="text/javascript" src="{{ url_for('static',filename='js/registro.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static',filename='js/topvote.js') }}"></script>
 {% endblock %}

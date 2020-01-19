@@ -1,0 +1,27 @@
+
+{% extends "base.html" %}
+
+{% block contenido %}
+
+<div class="text-center mt-5">
+  <h3>{{ lista["nombre"] }}<br>Agregar nuevo elemento:</h3>
+</div>
+<form class="create-element-form">
+  <div class="form-group">
+    <label for="title">Nombre</label>
+    <input type="title" name="name" class="form-control" id="title" placeholder="Nombre del elemento">
+  </div>
+  <div class="form-group">
+    <label for="description_id">Descripcion</label>
+    <input type="textarea" rows="5" name="description" class="form-control" id="description_id" placeholder="Describe el elemento">
+  </div>
+  <input name="list_id" value="{{ lista['id'] }}" class="list_id" hidden>
+  <div class="boton">
+      <button type="submit" class="btn btn-primary">Crear</button>
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" src="{{ url_for('static',filename='js/topvote.js') }}"></script>
+{% endblock %}

@@ -15,9 +15,10 @@
   <div class="boton">
       <button type="submit" class="btn btn-primary">Entrar!</button>
   </div>
+  <div class="alert alert-danger" role="alert" id="mensaje-error" style="display:none;text-align:center"></div>
 </form>
 {% endblock %}
 
 {% block scripts %}
-<script type="text/javascript" src="{{ url_for('static',filename='js/registro.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static',filename='js/topvote.js') }}"></script>
 {% endblock %}
