@@ -69,7 +69,6 @@ $( ".create-element-form" ).submit(function( event ) {
 
 $( ".boton_votar" ).click(function() {
     var id = $(this).attr("id")
-    alert($".")
     $.ajax({
         type: "post",
         url: "/elements/vote",

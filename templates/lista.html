@@ -6,6 +6,7 @@
   <div class="text-center"  style="margin-bottom:20px;">
     <h3>{{ lista["nombre"] }}</h3>
     <p>{{ lista["descripcion"] }}</p>
+    <input name="list_id" value="{{ lista['id'] }}" class="list_id" hidden>
     <span class="glyphicon glyphicon-plus"> <button class="btn btn-success" onclick="window.location.href='/elements/create?lista={{ lista['id'] }}'">
       Agregar</button></span>
   </div>
