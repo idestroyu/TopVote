@@ -49,8 +49,3 @@ INSERTAR_ELEMENTO = "INSERT INTO elementos (lista, votos, nombre, descripcion) V
 UPDATE_VISITAS_LISTA = "UPDATE listas SET visitas = visitas + 1 WHERE id=?;"
 
 UPDATE_VOTOS_ELEMENTO = "UPDATE elementos SET votos = votos + 1 WHERE id=?;"
-
-""" SELECCIONAR """
-ENCONTRAR_USUARIO = "INSERT INTO usuarios (email, password, salt, username) VALUES (?, ?, ?, ?);"
-
-ENCONTRAR_LISTA = "INSERT INTO usuarios (email, password, salt, username) VALUES (?, ?, ?, ?);"
