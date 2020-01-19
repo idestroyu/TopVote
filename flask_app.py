@@ -7,6 +7,7 @@ from users.registro import hash_password, verify_password
 
 app = Flask(__name__, template_folder='templates')
 
+# Para que nos deje utilizar sesiones de usuario
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
 def coger_categorias():
@@ -19,9 +20,12 @@ def render(template, **kwargs):
 @app.route('/')
 def index():
     top_listas = calls.fetch_all(calls.conexion(), "SELECT * "
-                                                   "FROM listas INNER JOIN categorias "
-                                                   "WHERE listas.categoria = categorias.id ORDER BY listas.visitas DESC LIMIT 4")
+                                                   "FROM listas ORDER BY listas.visitas DESC LIMIT 4")
     return render('index.html', top_listas=top_listas)
+
+@app.route('/create-list')
+def create_list_page():
+    return render('crear_lista.html')
 
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
@@ -77,9 +81,6 @@ def logout():
 
     return redirect('/')
 
-@app.route('/create-list')
-def create_list_page():
-    return render('crear_lista.html')
 
 @app.route('/categories', methods = ['GET'])
 def view_category():
@@ -94,6 +95,21 @@ def view_category():
     categoria = calls.fetch_all(conexion, "SELECT * FROM categorias WHERE id = ?", category)
 
     return render('categoria.html', listas=listas, categoria=categoria[0])
+
+@app.route('/lists', methods = ['GET'])
+def view_list():
+    if not 'loggedin' in session:
+        return redirect("/login")
+
+    lista = request.args.get('id')
+
+    conexion = calls.conexion()
+    elementos = calls.fetch_all(conexion, "SELECT * FROM elementos WHERE lista = ? ORDER BY votos DESC", lista)
+    lista = calls.fetch_all(conexion, "SELECT * FROM listas WHERE id = ?", lista)[0]
+
+    calls.modify(conexion, UPDATE_VISITAS_LISTA, lista["id"])
+
+    return render("lista.html", elementos=elementos, lista=lista)
 
 @app.route('/lists/create', methods=['POST'])
 def create_list():
@@ -131,6 +147,7 @@ def create_element():
         calls.modify(conexion, INSERTAR_ELEMENTO, lista_id, name, description)
         return jsonify(message="Elemento creado correctamente"), 200
 
+
 @app.route('/elements/vote', methods=['POST'])
 def vote_element():
     elemento_id = request.values["elemento_id"]
@@ -139,24 +156,6 @@ def vote_element():
     calls.modify(conexion, UPDATE_VOTOS_ELEMENTO, elemento_id)
 
     return jsonify(message="Elemento votado correctamente"), 200
-
-
-@app.route('/lists', methods = ['GET'])
-def view_list():
-    if not 'loggedin' in session:
-        return redirect("/login")
-
-    lista = request.args.get('id')
-
-    conexion = calls.conexion()
-    elementos = calls.fetch_all(conexion, "SELECT * FROM elementos WHERE lista = ? ORDER BY votos DESC", lista)
-
-    print(lista)
-    lista = calls.fetch_all(conexion, "SELECT * FROM listas WHERE id = ?", lista)[0]
-
-    calls.modify(conexion, UPDATE_VISITAS_LISTA, lista["id"])
-
-    return render("lista.html", elementos=elementos, lista=lista)
 
 if __name__ == '__main__':
     app.run()
