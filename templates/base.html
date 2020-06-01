@@ -50,7 +50,20 @@
       </div>
         {% block contenido %}{% endblock %}
 
+    </div>
+
+    {% for alert in alerts %}
+      <div class="alert alert-info" role="alert">
+        <a onclick="handleCloseAlert(this)" class="close" id="{{ alert.id }}" aria-label="close">&times;</a>
+        {{ alert.message }}
+      </div>
+    {% endfor %}
+
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='js/base.js') }}"></script>
+
     {% block scripts %}{% endblock %}
   </body>
 </html>

@@ -31,6 +31,11 @@ CREAR_VOTOS = "CREATE TABLE votos (user_id INTEGER NOT NULL, " \
                "element_id int, " \
                "PRIMARY KEY (user_id, list_id));" \
 
+CREAR_ALERTAS = "CREATE TABLE alertas (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " \
+                "user_id int, " \
+                "message varchar(255), " \
+                "seen int DEFAULT 0)"
+
 
 """ BORRAR TABLAS """
 BORRAR_CATEGORIAS = "DROP TABLE IF EXISTS categorias"
@@ -54,6 +59,8 @@ INSERTAR_CATEGORIA = "INSERT INTO categorias (nombre, descripcion, visitas, imag
 INSERTAR_ELEMENTO = "INSERT INTO elementos (lista, votos, nombre, descripcion) VALUES (?, 0, ?, ?);"
 
 INSERTAR_VOTO = "INSERT INTO votos (user_id, list_id, element_id) VALUES (?, ?, ?);"
+
+INSERTAR_ALERTA = "INSERT INTO alertas (user_id, message) VALUES (?, ?);"
 
 UPDATE_VISITAS_LISTA = "UPDATE listas SET visitas = visitas + 1 WHERE id=?;"
 

@@ -3,7 +3,7 @@ from flask import render_template, redirect, session, jsonify
 
 import db.llamadas as calls
 from db.queries import INSERTAR_USUARIO, INSERTAR_LISTA, INSERTAR_ELEMENTO, UPDATE_VISITAS_LISTA, \
-    SEARCH_LIST, INSERTAR_VOTO, BORRAR_VOTO, UPDATE_VOTOS_ELEMENTO_RESTAR, UPDATE_VOTOS_ELEMENTO_SUMAR
+    SEARCH_LIST, INSERTAR_VOTO, BORRAR_VOTO, UPDATE_VOTOS_ELEMENTO_RESTAR, UPDATE_VOTOS_ELEMENTO_SUMAR, INSERTAR_ALERTA
 from users.registro import hash_password, verify_password
 
 app = Flask(__name__, template_folder='templates')
@@ -22,7 +22,9 @@ def render(template, **kwargs):
 def index():
     top_listas = calls.fetch_all(calls.conexion(), "SELECT * "
                                                    "FROM listas ORDER BY listas.visitas DESC LIMIT 4")
-    return render('index.html', top_listas=top_listas)
+    conexion = calls.conexion()
+
+    return render('index.html', top_listas=top_listas, alerts=get_alerts(conexion))
 
 @app.route('/create-list')
 def create_list_page():
@@ -84,7 +86,7 @@ def profile():
     created_lists = calls.fetch_all(conexion, "SELECT * FROM listas WHERE usuario_creador = ?", user_id)
     voted_lists = calls.fetch_all(conexion, "SELECT DISTINCT * FROM votos INNER JOIN listas WHERE user_id = ? AND list_id = id", user_id)
 
-    return render('profile.html', username=session["username"], created_lists=created_lists, voted_lists=voted_lists)
+    return render('profile.html', username=session["username"], created_lists=created_lists, voted_lists=voted_lists, alerts=get_alerts(conexion))
 
 @app.route('/logout', methods = ['GET'])
 def logout():
@@ -107,7 +109,7 @@ def view_category():
     listas = calls.fetch_all(conexion, "SELECT * FROM listas WHERE categoria = ?", category)
     categoria = calls.fetch_all(conexion, "SELECT * FROM categorias WHERE id = ?", category)
 
-    return render('categoria.html', listas=listas, categoria=categoria[0])
+    return render('categoria.html', listas=listas, categoria=categoria[0], alerts=get_alerts(conexion))
 
 @app.route('/lists', methods = ['GET'])
 def view_list():
@@ -127,7 +129,7 @@ def view_list():
 
     calls.modify(conexion, UPDATE_VISITAS_LISTA, lista["id"])
 
-    return render("lista.html", elementos=elementos, lista=lista, votado=votado)
+    return render("lista.html", elementos=elementos, lista=lista, votado=votado, alerts=get_alerts(conexion))
 
 @app.route('/lists/create', methods=['POST'])
 def create_list():
@@ -141,7 +143,21 @@ def create_list():
 
     conexion = calls.conexion()
     user_id = current_user_id(conexion)
-    calls.modify(conexion, INSERTAR_LISTA, category, user_id, title, description, image)
+    lista_id = calls.modify(conexion, INSERTAR_LISTA, category, user_id, title, description, image)
+
+    print(lista_id)
+
+    if len(request.files) > 0:
+        elementos = request.files[next(iter(request.files))].readlines()
+        for elemento in elementos:
+            try:
+                name, description = elemento.decode("utf-8").replace("\n", "").replace("\r", "").split(",")
+                print (name, description)
+                calls.modify(conexion, INSERTAR_ELEMENTO, lista_id, name, description)
+            except Exception as e:
+                print(e)
+                pass
+
 
     return jsonify(message="Lista creada"), 200
 
@@ -153,7 +169,7 @@ def create_element():
         else:
             conexion = calls.conexion()
             list = calls.fetch_all(conexion, "SELECT * FROM listas WHERE id=?", request.args.get('lista'))[0]
-            return render('crear_elemento.html', lista=list)
+            return render('crear_elemento.html', lista=list, alerts=get_alerts(conexion))
     elif request.method == 'POST':
         lista_id = request.form['list_id']
         name = request.form['name']
@@ -164,6 +180,8 @@ def create_element():
         lista = calls.fetch_all(conexion, "SELECT * FROM listas WHERE id = ?", lista_id)[0]
 
         calls.modify(conexion, INSERTAR_ELEMENTO, lista_id, name, description)
+        calls.modify(conexion, INSERTAR_ALERTA, lista["usuario_creador"], "El usuario {} creo un elemento en tu lista"
+                     .format(session["username"]))
         return jsonify(message="Elemento creado correctamente"), 200
 
 @app.route('/elements/vote', methods=['POST'])
@@ -172,17 +190,20 @@ def vote_element():
 
     conexion = calls.conexion()
 
-    lista_id = calls.fetch_all(conexion, "SELECT lista FROM elementos WHERE id = ?;", elemento_id)[0]["lista"]
+    lista_id = calls.fetch_all(conexion, "SELECT * FROM elementos WHERE id = ?;", elemento_id)[0]["lista"]
+    usuario_creador = calls.fetch_all(conexion, "SELECT * FROM listas WHERE id = ?;", lista_id)[0]["usuario_creador"]
     user_id = current_user_id(conexion)
 
     if len(calls.fetch_all(conexion, "SELECT * FROM votos WHERE list_id = ? AND user_id = ?;", lista_id, user_id)) == 0:
         calls.modify(conexion, UPDATE_VOTOS_ELEMENTO_SUMAR, elemento_id)
         calls.modify(conexion, INSERTAR_VOTO, user_id, lista_id, elemento_id)
+        calls.modify(conexion, INSERTAR_ALERTA, usuario_creador, "El usuario {} voto un elemento en tu lista"
+                     .format(session["username"]))
         return jsonify(message="Elemento votado correctamente"), 200
     return jsonify(message="Elemento votado correctamente"), 409
 
 @app.route('/elements/deletevote', methods=['DELETE'])
-def delete_element():
+def delete_vote():
     elemento_id = request.values["elemento_id"]
 
     conexion = calls.conexion()
@@ -203,12 +224,29 @@ def search_list():
     conexion = calls.conexion()
 
     lists = calls.fetch_all(conexion, SEARCH_LIST, '%{}%'.format(query.lower()))
-    return render('search.html', listas=lists, query=query)
+    return render('search.html', listas=lists, query=query, alerts=get_alerts(conexion))
+
+@app.route('/alerts/seen', methods=['POST'])
+def see_alert():
+    alert_id = request.values["alert_id"]
+
+    conexion = calls.conexion()
+
+    calls.modify(conexion, "UPDATE alertas SET seen = 1 WHERE id = ?", alert_id)
+
+    return jsonify(message="Alerta vista correctamente"), 200
 
 
 def current_user_id(conexion):
     return calls.fetch_all(conexion, "SELECT id FROM usuarios WHERE username = ?;", session["username"])[0]["id"]
 
+
+def get_alerts(conexion):
+    try:
+        user_id = current_user_id(conexion)
+        return calls.fetch_all(conexion, "SELECT * FROM alertas WHERE user_id = ? AND seen == 0", user_id)
+    except Exception:
+        return []
 
 if __name__ == '__main__':
     app.run()

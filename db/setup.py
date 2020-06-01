@@ -11,6 +11,7 @@ def init_db():
     call.modify(conexion, q.CREAR_LISTAS)
     call.modify(conexion, q.CREAR_ELEMENTOS)
     call.modify(conexion, q.CREAR_VOTOS)
+    call.modify(conexion, q.CREAR_ALERTAS)
 
 def init_categorias():
     conexion = call.conexion()

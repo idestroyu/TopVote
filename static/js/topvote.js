@@ -35,13 +35,24 @@ event.preventDefault();
 
 // Mandar formulario para crear lista
 $( "#create-list-form" ).submit(function( event ) {
+
   var form = $(this);
   var data = form.serializeArray();
-  data.push({name: 'category_id', value: $("#category_id").children("option:selected").attr("id")});
+
+  var formData = new FormData(this);
+
+  formData.append("category_id", $("#category_id").children("option:selected").attr("id"))
+  formData.append("elements_file", $('input[type=file]')[0].files[0]);
+
+  console.log(formData.get("elements_file"));
   $.ajax({
     type: "post",
     url: "/lists/create",
-    data: data
+    data: formData,
+    cache: false,
+    contentType: false,
+    processData: false,
+    enctype: 'multipart/form-data'
   }).done(function(data) {
     window.location.href = "/"
   }).fail(function(data) {
@@ -89,4 +100,10 @@ $( ".boton_borrar_voto" ).click(function() {
         window.location.href = "/lists?id=" + $(".list_id").attr("value")
     }).fail(function(data) {
     });
+});
+
+$(".alert").on("close.bs.alert", function () {
+      $alertMsg.hide();
+      console.log("HERE")
+      return false;
 });

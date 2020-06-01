@@ -19,4 +19,6 @@ def fetch_all(conexion, query, *args):
 def modify(conexion, query, *args):
     cursor = conexion.cursor()
     cursor.execute(query, args)
+    id = cursor.lastrowid
     conexion.commit()
+    return id

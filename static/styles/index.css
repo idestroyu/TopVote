@@ -136,3 +136,10 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 2.5px;
   margin-right: 10px;
 }
+
+.alert {
+    left: 10px;
+    top: 80%;
+    position: absolute;
+    width: 400px;
+}
