@@ -1,11 +1,11 @@
-form {
+.topvote-form {
     margin: 0 auto;
     width:250px;
     margin-top: 50px;
     margin-bottom: 50px;
 }
 
-form div {
+.topvote-form div {
     margin-top: 20px;
     margin-bottom: 20px;
 }

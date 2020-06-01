@@ -2,7 +2,8 @@ from flask import Flask, request
 from flask import render_template, redirect, session, jsonify
 
 import db.llamadas as calls
-from db.queries import INSERTAR_USUARIO, INSERTAR_LISTA, INSERTAR_ELEMENTO, UPDATE_VISITAS_LISTA, UPDATE_VOTOS_ELEMENTO
+from db.queries import INSERTAR_USUARIO, INSERTAR_LISTA, INSERTAR_ELEMENTO, UPDATE_VISITAS_LISTA, UPDATE_VOTOS_ELEMENTO, \
+    SEARCH_LIST
 from users.registro import hash_password, verify_password
 
 app = Flask(__name__, template_folder='templates')
@@ -101,15 +102,18 @@ def view_list():
     if not 'loggedin' in session:
         return redirect("/login")
 
-    lista = request.args.get('id')
+    lista_id = request.args.get('id')
 
     conexion = calls.conexion()
-    elementos = calls.fetch_all(conexion, "SELECT * FROM elementos WHERE lista = ? ORDER BY votos DESC", lista)
-    lista = calls.fetch_all(conexion, "SELECT * FROM listas WHERE id = ?", lista)[0]
+    user_id = calls.fetch_all(conexion, "SELECT id FROM usuarios WHERE username = ?;", session["username"])[0]["id"]
+    elementos = calls.fetch_all(conexion, "SELECT * FROM elementos WHERE lista = ? ORDER BY votos DESC", lista_id)
+    lista = calls.fetch_all(conexion, "SELECT * FROM listas WHERE id = ?", lista_id)[0]
+
+    votado = len(calls.fetch_all(conexion, "SELECT element_id FROM votos WHERE list_id = ? AND user_id = ?;", lista_id, user_id))
 
     calls.modify(conexion, UPDATE_VISITAS_LISTA, lista["id"])
 
-    return render("lista.html", elementos=elementos, lista=lista)
+    return render("lista.html", elementos=elementos, lista=lista, votado=votado)
 
 @app.route('/lists/create', methods=['POST'])
 def create_list():
@@ -147,15 +151,29 @@ def create_element():
         calls.modify(conexion, INSERTAR_ELEMENTO, lista_id, name, description)
         return jsonify(message="Elemento creado correctamente"), 200
 
-
 @app.route('/elements/vote', methods=['POST'])
 def vote_element():
     elemento_id = request.values["elemento_id"]
 
     conexion = calls.conexion()
-    calls.modify(conexion, UPDATE_VOTOS_ELEMENTO, elemento_id)
 
-    return jsonify(message="Elemento votado correctamente"), 200
+    lista_id = calls.fetch_all(conexion, "SELECT lista FROM elementos WHERE id = ?;", elemento_id)[0]["lista"]
+    user_id = calls.fetch_all(conexion, "SELECT id FROM usuarios WHERE username = ?;", session["username"])[0]["id"]
+
+    if len(calls.fetch_all(conexion, "SELECT * FROM votos WHERE list_id = ? AND user_id = ?;", lista_id, user_id)) > 0:
+        calls.modify(conexion, UPDATE_VOTOS_ELEMENTO, elemento_id, user_id, lista_id, elemento_id)
+        return jsonify(message="Elemento votado correctamente"), 200
+    return jsonify(message="Elemento votado correctamente"), 409
+
+
+@app.route("/lists/search", methods=['GET'])
+def search_list():
+    query = request.args.get('query')
+
+    conexion = calls.conexion()
+
+    lists = calls.fetch_all(conexion, SEARCH_LIST, '%{}%'.format(query.lower()))
+    return render('search.html', listas=lists, query=query)
 
 if __name__ == '__main__':
     app.run()

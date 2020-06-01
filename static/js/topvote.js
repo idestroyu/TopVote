@@ -1,5 +1,5 @@
 // Mandar formulario para registrarse
-$( ".register-form" ).submit(function( event ) {
+$( "#register-form" ).submit(function( event ) {
   var form = $(this);
   console.log(form.serialize())
   $.ajax({
@@ -17,7 +17,7 @@ $( ".register-form" ).submit(function( event ) {
 });
 
 // Mandar formulario para log in
-$( ".login-form" ).submit(function( event ) {
+$( "#login-form" ).submit(function( event ) {
     var form = $(this);
     $.ajax({
         type: "post",
@@ -34,7 +34,7 @@ event.preventDefault();
 });
 
 // Mandar formulario para crear lista
-$( ".create-list-form" ).submit(function( event ) {
+$( "#create-list-form" ).submit(function( event ) {
   var form = $(this);
   var data = form.serializeArray();
   data.push({name: 'category_id', value: $("#category_id").children("option:selected").attr("id")});
@@ -52,7 +52,7 @@ $( ".create-list-form" ).submit(function( event ) {
 });
 
 // Mandar formulario para crear elemento
-$( ".create-element-form" ).submit(function( event ) {
+$( "#create-element-form" ).submit(function( event ) {
   var form = $(this);
   var data = form.serializeArray();
   $.ajax({
@@ -72,7 +72,7 @@ $( ".boton_votar" ).click(function() {
     $.ajax({
         type: "post",
         url: "/elements/vote",
-        data: {"elemento_id": id}
+        data: {"elemento_id": id, "lista_id"}
     }).done(function(data) {
         window.location.href = "/lists?id=" + $(".list_id").attr("value")
     }).fail(function(data) {

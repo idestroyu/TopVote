@@ -28,7 +28,17 @@
         <td>{{ elemento["nombre"] }}</td>
         <td>{{ elemento["descripcion"] }}</td>
         <td>{{ elemento["votos"] }}</td>
-        <td><button type="button" id="{{ elemento['id'] }}" class="btn btn-success boton_votar">Votar</button></td>
+        <td>
+          {% if votado %}
+
+            {% if elemento['id'] == votado %}
+            <p>Votaste este elemento</p>
+            {% endif %}
+
+          {% else %}
+          <button type="button" id="{{ elemento['id'] }}" class="btn btn-success boton_votar">Votar</button>
+          {% endif %}
+        </td>
       </tr>
       {% endfor %}
     </tbody>
