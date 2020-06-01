@@ -48,11 +48,12 @@ INSERTAR_LISTA = "INSERT INTO listas (categoria, nombre, descripcion, visitas, i
 
 INSERTAR_CATEGORIA = "INSERT INTO categorias (nombre, descripcion, visitas, imagen) VALUES (?, ?, 0, ?);"
 
-INSERTAR_ELEMENTO = "INSERT INTO elementos (lista, votos, nombre, descripcion) VALUES (?, 1, ?, ?);"
+INSERTAR_ELEMENTO = "INSERT INTO elementos (lista, votos, nombre, descripcion) VALUES (?, 0, ?, ?);"
+
+INSERTAR_VOTO = "INSERT INTO votos (user_id, list_id, element_id) VALUES (?, ?, ?);"
 
 UPDATE_VISITAS_LISTA = "UPDATE listas SET visitas = visitas + 1 WHERE id=?;"
 
-UPDATE_VOTOS_ELEMENTO = "UPDATE elementos SET votos = votos + 1 WHERE id=?; " \
-                        "INSERT INTO votos (user_id, lista_id, element_id) VALUES (?, ?, ?);"
+UPDATE_VOTOS_ELEMENTO = "UPDATE elementos SET votos = votos + 1 WHERE id=?;"
 
 SEARCH_LIST = "SELECT * FROM listas WHERE LOWER(nombre) LIKE ?;"

@@ -3,7 +3,7 @@ from flask import render_template, redirect, session, jsonify
 
 import db.llamadas as calls
 from db.queries import INSERTAR_USUARIO, INSERTAR_LISTA, INSERTAR_ELEMENTO, UPDATE_VISITAS_LISTA, UPDATE_VOTOS_ELEMENTO, \
-    SEARCH_LIST
+    SEARCH_LIST, INSERTAR_VOTO
 from users.registro import hash_password, verify_password
 
 app = Flask(__name__, template_folder='templates')
@@ -109,7 +109,9 @@ def view_list():
     elementos = calls.fetch_all(conexion, "SELECT * FROM elementos WHERE lista = ? ORDER BY votos DESC", lista_id)
     lista = calls.fetch_all(conexion, "SELECT * FROM listas WHERE id = ?", lista_id)[0]
 
-    votado = len(calls.fetch_all(conexion, "SELECT element_id FROM votos WHERE list_id = ? AND user_id = ?;", lista_id, user_id))
+    resultados_votado = calls.fetch_all(conexion, "SELECT element_id FROM votos WHERE list_id = ? AND user_id = ?;", lista_id, user_id)
+
+    votado = resultados_votado[0]["element_id"] if len(resultados_votado) > 0 else None
 
     calls.modify(conexion, UPDATE_VISITAS_LISTA, lista["id"])
 
@@ -160,8 +162,9 @@ def vote_element():
     lista_id = calls.fetch_all(conexion, "SELECT lista FROM elementos WHERE id = ?;", elemento_id)[0]["lista"]
     user_id = calls.fetch_all(conexion, "SELECT id FROM usuarios WHERE username = ?;", session["username"])[0]["id"]
 
-    if len(calls.fetch_all(conexion, "SELECT * FROM votos WHERE list_id = ? AND user_id = ?;", lista_id, user_id)) > 0:
-        calls.modify(conexion, UPDATE_VOTOS_ELEMENTO, elemento_id, user_id, lista_id, elemento_id)
+    if len(calls.fetch_all(conexion, "SELECT * FROM votos WHERE list_id = ? AND user_id = ?;", lista_id, user_id)) == 0:
+        calls.modify(conexion, UPDATE_VOTOS_ELEMENTO, elemento_id)
+        calls.modify(conexion, INSERTAR_VOTO, user_id, lista_id, elemento_id)
         return jsonify(message="Elemento votado correctamente"), 200
     return jsonify(message="Elemento votado correctamente"), 409
 

@@ -72,7 +72,7 @@ $( ".boton_votar" ).click(function() {
     $.ajax({
         type: "post",
         url: "/elements/vote",
-        data: {"elemento_id": id, "lista_id"}
+        data: {"elemento_id": id}
     }).done(function(data) {
         window.location.href = "/lists?id=" + $(".list_id").attr("value")
     }).fail(function(data) {
