@@ -78,3 +78,15 @@ $( ".boton_votar" ).click(function() {
     }).fail(function(data) {
     });
 });
+
+$( ".boton_borrar_voto" ).click(function() {
+    var id = $(this).attr("id")
+    $.ajax({
+        type: "delete",
+        url: "/elements/deletevote",
+        data: {"elemento_id": id}
+    }).done(function(data) {
+        window.location.href = "/lists?id=" + $(".list_id").attr("value")
+    }).fail(function(data) {
+    });
+});

@@ -40,6 +40,8 @@ BORRAR_LISTAS = "DROP TABLE IF EXISTS listas"
 
 BORRAR_ELEMENTOS = "DROP TABLE IF EXISTS elementos"
 
+BORRAR_VOTOS = "DROP TABLE IF EXISTS votos"
+
 
 """ INSERTAR EN TABLAS """
 INSERTAR_USUARIO = "INSERT INTO usuarios (email, password, username) VALUES (?, ?, ?);"
@@ -54,6 +56,12 @@ INSERTAR_VOTO = "INSERT INTO votos (user_id, list_id, element_id) VALUES (?, ?, 
 
 UPDATE_VISITAS_LISTA = "UPDATE listas SET visitas = visitas + 1 WHERE id=?;"
 
-UPDATE_VOTOS_ELEMENTO = "UPDATE elementos SET votos = votos + 1 WHERE id=?;"
+UPDATE_VOTOS_ELEMENTO_SUMAR = "UPDATE elementos SET votos = votos + 1 WHERE id=?;"
+
+UPDATE_VOTOS_ELEMENTO_RESTAR = "UPDATE elementos SET votos = votos - 1 WHERE id=?;"
+
+""" BORRAR FILAS """
+
+BORRAR_VOTO = "DELETE FROM votos WHERE user_id = ? AND element_id = ? AND list_id = ?"
 
 SEARCH_LIST = "SELECT * FROM listas WHERE LOWER(nombre) LIKE ?;"

@@ -2,8 +2,8 @@ from flask import Flask, request
 from flask import render_template, redirect, session, jsonify
 
 import db.llamadas as calls
-from db.queries import INSERTAR_USUARIO, INSERTAR_LISTA, INSERTAR_ELEMENTO, UPDATE_VISITAS_LISTA, UPDATE_VOTOS_ELEMENTO, \
-    SEARCH_LIST, INSERTAR_VOTO
+from db.queries import INSERTAR_USUARIO, INSERTAR_LISTA, INSERTAR_ELEMENTO, UPDATE_VISITAS_LISTA, \
+    SEARCH_LIST, INSERTAR_VOTO, BORRAR_VOTO, UPDATE_VOTOS_ELEMENTO_RESTAR, UPDATE_VOTOS_ELEMENTO_SUMAR
 from users.registro import hash_password, verify_password
 
 app = Flask(__name__, template_folder='templates')
@@ -163,10 +163,24 @@ def vote_element():
     user_id = calls.fetch_all(conexion, "SELECT id FROM usuarios WHERE username = ?;", session["username"])[0]["id"]
 
     if len(calls.fetch_all(conexion, "SELECT * FROM votos WHERE list_id = ? AND user_id = ?;", lista_id, user_id)) == 0:
-        calls.modify(conexion, UPDATE_VOTOS_ELEMENTO, elemento_id)
+        calls.modify(conexion, UPDATE_VOTOS_ELEMENTO_SUMAR, elemento_id)
         calls.modify(conexion, INSERTAR_VOTO, user_id, lista_id, elemento_id)
         return jsonify(message="Elemento votado correctamente"), 200
     return jsonify(message="Elemento votado correctamente"), 409
+
+@app.route('/elements/deletevote', methods=['DELETE'])
+def delete_element():
+    elemento_id = request.values["elemento_id"]
+
+    conexion = calls.conexion()
+
+    lista_id = calls.fetch_all(conexion, "SELECT lista FROM elementos WHERE id = ?;", elemento_id)[0]["lista"]
+    user_id = calls.fetch_all(conexion, "SELECT id FROM usuarios WHERE username = ?;", session["username"])[0]["id"]
+
+    calls.modify(conexion, BORRAR_VOTO, user_id, elemento_id, lista_id)
+    calls.modify(conexion, UPDATE_VOTOS_ELEMENTO_RESTAR, elemento_id)
+
+    return jsonify(message="Elemento borrado correctamente"), 200
 
 
 @app.route("/lists/search", methods=['GET'])
