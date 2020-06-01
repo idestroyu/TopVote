@@ -20,7 +20,7 @@
               {% if not session.loggedin %}
               <a class="text-muted" href="/register">Registrarse</a>
               {% else %}
-              <a class="text-muted" href="/register">{{ session.username }}</a>
+              <a class="text-muted" href="/profile">{{ session.username }}</a>
               <a class="btn btn-sm btn-outline-secondary" href="/create-list">Crear lista</a>
               {% endif %}
             </div>
@@ -32,6 +32,9 @@
             {% if not session.loggedin %}
             <a class="btn btn-sm btn-outline-secondary" href="/login">Iniciar sesion</a>
             {% else %}
+            <form action="/lists/search" method="get">
+              <input class="header-search" type="text" name="query" class="form-control" placeholder="Find lists" aria-label="Default">
+            </form>
             <a class="btn btn-sm btn-outline-secondary" href="/logout">Cerrar sesion</a>
             {% endif %}
           </div>

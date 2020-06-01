@@ -14,6 +14,7 @@ CREAR_USUARIOS = "CREATE TABLE usuarios (id INTEGER PRIMARY KEY AUTOINCREMENT NO
 
 CREAR_LISTAS = "CREATE TABLE listas (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " \
                "categoria int, " \
+               "usuario_creador int, " \
                "nombre varchar(255), " \
                "descripcion varchar(255), " \
                "visitas int, " \
@@ -46,7 +47,7 @@ BORRAR_VOTOS = "DROP TABLE IF EXISTS votos"
 """ INSERTAR EN TABLAS """
 INSERTAR_USUARIO = "INSERT INTO usuarios (email, password, username) VALUES (?, ?, ?);"
 
-INSERTAR_LISTA = "INSERT INTO listas (categoria, nombre, descripcion, visitas, imagen) VALUES (?, ?, ?, 0, ?);"
+INSERTAR_LISTA = "INSERT INTO listas (categoria, usuario_creador, nombre, descripcion, visitas, imagen) VALUES (?, ?, ?, ?, 0, ?);"
 
 INSERTAR_CATEGORIA = "INSERT INTO categorias (nombre, descripcion, visitas, imagen) VALUES (?, ?, 0, ?);"
 

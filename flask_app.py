@@ -74,6 +74,18 @@ def register():
         session['username'] = username
         return redirect('/')
 
+@app.route('/profile', methods = ['GET'])
+def profile():
+
+    # Listar categoria con el id pedido
+    conexion = calls.conexion()
+    user_id = current_user_id(conexion)
+
+    created_lists = calls.fetch_all(conexion, "SELECT * FROM listas WHERE usuario_creador = ?", user_id)
+    voted_lists = calls.fetch_all(conexion, "SELECT DISTINCT * FROM votos INNER JOIN listas WHERE user_id = ? AND list_id = id", user_id)
+
+    return render('profile.html', username=session["username"], created_lists=created_lists, voted_lists=voted_lists)
+
 @app.route('/logout', methods = ['GET'])
 def logout():
     # Borrar la sesion
@@ -105,7 +117,7 @@ def view_list():
     lista_id = request.args.get('id')
 
     conexion = calls.conexion()
-    user_id = calls.fetch_all(conexion, "SELECT id FROM usuarios WHERE username = ?;", session["username"])[0]["id"]
+    user_id = current_user_id(conexion)
     elementos = calls.fetch_all(conexion, "SELECT * FROM elementos WHERE lista = ? ORDER BY votos DESC", lista_id)
     lista = calls.fetch_all(conexion, "SELECT * FROM listas WHERE id = ?", lista_id)[0]
 
@@ -128,7 +140,8 @@ def create_list():
     image = request.form['image']
 
     conexion = calls.conexion()
-    calls.modify(conexion, INSERTAR_LISTA, category, title, description, image)
+    user_id = current_user_id(conexion)
+    calls.modify(conexion, INSERTAR_LISTA, category, user_id, title, description, image)
 
     return jsonify(message="Lista creada"), 200
 
@@ -160,7 +173,7 @@ def vote_element():
     conexion = calls.conexion()
 
     lista_id = calls.fetch_all(conexion, "SELECT lista FROM elementos WHERE id = ?;", elemento_id)[0]["lista"]
-    user_id = calls.fetch_all(conexion, "SELECT id FROM usuarios WHERE username = ?;", session["username"])[0]["id"]
+    user_id = current_user_id(conexion)
 
     if len(calls.fetch_all(conexion, "SELECT * FROM votos WHERE list_id = ? AND user_id = ?;", lista_id, user_id)) == 0:
         calls.modify(conexion, UPDATE_VOTOS_ELEMENTO_SUMAR, elemento_id)
@@ -175,7 +188,7 @@ def delete_element():
     conexion = calls.conexion()
 
     lista_id = calls.fetch_all(conexion, "SELECT lista FROM elementos WHERE id = ?;", elemento_id)[0]["lista"]
-    user_id = calls.fetch_all(conexion, "SELECT id FROM usuarios WHERE username = ?;", session["username"])[0]["id"]
+    user_id = current_user_id(conexion)
 
     calls.modify(conexion, BORRAR_VOTO, user_id, elemento_id, lista_id)
     calls.modify(conexion, UPDATE_VOTOS_ELEMENTO_RESTAR, elemento_id)
@@ -191,6 +204,11 @@ def search_list():
 
     lists = calls.fetch_all(conexion, SEARCH_LIST, '%{}%'.format(query.lower()))
     return render('search.html', listas=lists, query=query)
+
+
+def current_user_id(conexion):
+    return calls.fetch_all(conexion, "SELECT id FROM usuarios WHERE username = ?;", session["username"])[0]["id"]
+
 
 if __name__ == '__main__':
     app.run()

@@ -10,7 +10,7 @@
           <p class="lead mb-0"><a href="/register" class="text-white font-weight-bold">Registrate para buscar y crear listas</a></p>
           {% else %}
           <p class="lead mb-0"><a href="" class="text-white font-weight-bold">Empieza a buscar</a></p>
-          <form action="/lists/search" method="get">
+          <form action="/lists/search" method="get" class="md-form mt-0">
             <input type="text" name="query" class="form-control" aria-label="Default">
           </form>
           {% endif %}
