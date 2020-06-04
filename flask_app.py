@@ -1,3 +1,5 @@
+import logging
+
 from flask import Flask, request
 from flask import render_template, redirect, session, jsonify
 
@@ -209,6 +211,7 @@ def delete_vote():
     conexion = calls.conexion()
 
     lista_id = calls.fetch_all(conexion, "SELECT lista FROM elementos WHERE id = ?;", elemento_id)[0]["lista"]
+    logging.error('Lista id found was = {}'.format(lista_id))
     user_id = current_user_id(conexion)
 
     calls.modify(conexion, BORRAR_VOTO, user_id, elemento_id, lista_id)
@@ -238,8 +241,9 @@ def see_alert():
 
 
 def current_user_id(conexion):
-    return calls.fetch_all(conexion, "SELECT id FROM usuarios WHERE username = ?;", session["username"])[0]["id"]
-
+    user_id = calls.fetch_all(conexion, "SELECT id FROM usuarios WHERE username = ?;", session["username"])[0]["id"]
+    logging.error('User id found was = {}'.format(user_id))
+    return user_id
 
 def get_alerts(conexion):
     try:
