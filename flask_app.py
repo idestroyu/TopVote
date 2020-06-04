@@ -242,7 +242,8 @@ def see_alert():
 
 def current_user_id(conexion):
     user_id = calls.fetch_all(conexion, "SELECT id FROM usuarios WHERE username = ?;", session["username"])[0]["id"]
-    logging.error('User id found was = {}'.format(user_id))
+    logging.error('User id found')
+    logging.error(user_id)
     return user_id
 
 def get_alerts(conexion):
