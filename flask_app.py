@@ -1,6 +1,3 @@
-import logging
-import sys
-
 from flask import Flask, request
 from flask import render_template, redirect, session, jsonify
 
@@ -148,17 +145,13 @@ def create_list():
     user_id = current_user_id(conexion)
     lista_id = calls.modify(conexion, INSERTAR_LISTA, category, user_id, title, description, image)
 
-    print(lista_id)
-
     if len(request.files) > 0:
         elementos = request.files[next(iter(request.files))].readlines()
         for elemento in elementos:
             try:
                 name, description = elemento.decode("utf-8").replace("\n", "").replace("\r", "").split(",")
-                print (name, description)
                 calls.modify(conexion, INSERTAR_ELEMENTO, lista_id, name, description)
             except Exception as e:
-                print(e)
                 pass
 
 
@@ -212,7 +205,6 @@ def delete_vote():
     conexion = calls.conexion()
 
     lista_id = calls.fetch_all(conexion, "SELECT lista FROM elementos WHERE id = ?;", elemento_id)[0]["lista"]
-    logging.error('Lista id found was = {}'.format(lista_id))
     user_id = current_user_id(conexion)
 
     calls.modify(conexion, BORRAR_VOTO, user_id, elemento_id, lista_id)
@@ -242,10 +234,7 @@ def see_alert():
 
 
 def current_user_id(conexion):
-    user_id = calls.fetch_all(conexion, "SELECT id FROM usuarios WHERE username = ?;", session["username"])[0]["id"]
-    if True:
-        raise Exception("user id = {}".format(user_id))
-    return user_id
+    return calls.fetch_all(conexion, "SELECT id FROM usuarios WHERE username = ?;", session["username"])[0]["id"]
 
 def get_alerts(conexion):
     try:
