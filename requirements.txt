@@ -3,7 +3,7 @@ bcrypt==3.1.7
 cffi==1.13.2
 Click==7.0
 cryptography==2.8
-Django==2.2.6
+Django==2.2.20
 django-cors-headers==3.1.1
 djangorestframework==3.10.3
 Flask==1.1.1
